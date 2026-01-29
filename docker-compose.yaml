@@ -1,0 +1,28 @@
+services:
+  pg_write:
+    image: postgres:16
+    container_name: pg_write
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ecommerce_write
+    ports:
+      - "5433:5432"
+    volumes:
+      - pg_write_data:/var/lib/postgresql/data
+
+  pg_read:
+    image: postgres:16
+    container_name: pg_read
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ecommerce_read
+    ports:
+      - "5434:5432"
+    volumes:
+      - pg_read_data:/var/lib/postgresql/data
+
+volumes:
+  pg_write_data:
+  pg_read_data:
