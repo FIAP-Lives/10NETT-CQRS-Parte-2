@@ -1,14 +1,16 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Ecommerce.CrudApi.Data.Write.Entities;
+using Microsoft.EntityFrameworkCore;
 
-namespace Ecommerce.CrudApi.Data;
+namespace Ecommerce.CrudApi.Data.Write;
 
-public sealed class CrudDbContext : DbContext
+public sealed class WriteDbContext : DbContext
 {
-    public CrudDbContext(DbContextOptions<CrudDbContext> options) : base(options) { }
+    public WriteDbContext(DbContextOptions<WriteDbContext> options) : base(options) { }
 
     public DbSet<Product> Products => Set<Product>();
     public DbSet<Order> Orders => Set<Order>();
     public DbSet<OrderItem> OrderItems => Set<OrderItem>();
+    public DbSet<OutboxMessage> OutboxMessages => Set<OutboxMessage>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -36,6 +38,16 @@ public sealed class CrudDbContext : DbContext
             b.HasKey(x => x.Id);
             b.Property(x => x.UnitPrice).HasColumnType("numeric(18,2)");
             b.HasOne<Product>().WithMany().HasForeignKey(x => x.ProductId);
+        });
+
+        modelBuilder.Entity<OutboxMessage>(b =>
+        {
+            b.ToTable("outbox_messages");
+            b.HasKey(x => x.Id);
+            b.Property(x => x.Type).IsRequired().HasMaxLength(200);
+            b.Property(x => x.Payload).IsRequired();
+            b.Property(x => x.OccurredAtUtc).IsRequired();
+            b.Property(x => x.ProcessedAtUtc);
         });
     }
 }

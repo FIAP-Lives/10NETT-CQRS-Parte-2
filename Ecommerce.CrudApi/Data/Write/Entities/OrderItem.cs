@@ -1,4 +1,4 @@
-﻿namespace Ecommerce.CrudApi.Data;
+﻿namespace Ecommerce.CrudApi.Data.Write.Entities;
 
 public sealed class OrderItem
 {

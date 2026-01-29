@@ -1,18 +1,20 @@
-﻿using Ecommerce.CrudApi.Data;
+﻿using Ecommerce.CrudApi.Data.Write;
+using Ecommerce.CrudApi.Data.Write.Entities;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace Ecommerce.CrudApi.Features.Orders.Queries
 {
-    public class GetOrderByIdQueryHandler
+    public class GetOrderByIdQueryHandler : IRequestHandler<GetOrderByIdQuery, Result<OrderDto>>
     {
-        private readonly CrudDbContext db;
+        private readonly WriteDbContext db;
 
-        public GetOrderByIdQueryHandler(CrudDbContext db)
+        public GetOrderByIdQueryHandler(WriteDbContext db)
         {
             this.db = db;
         }
 
-        public async Task<Result<OrderDto>> Handle(GetOrderByIdQuery query)
+        public async Task<Result<OrderDto>> Handle(GetOrderByIdQuery query, CancellationToken ct)
         {
             var existing = db.Orders.Include(x => x.Items).FirstOrDefault(x => x.Id == query.Id);
 

@@ -1,10 +1,12 @@
-﻿using Ecommerce.CrudApi.Data;
-using Ecommerce.CrudApi.Features.Orders.Commands.CreateOrder;
+﻿using Ecommerce.CrudApi.Features.Orders.Commands.CreateOrder;
 using Ecommerce.Shared.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Ecommerce.CrudApi;
 using Ecommerce.CrudApi.Features.Orders.Queries;
+using MediatR;
+using Ecommerce.CrudApi.Data.Write;
+using Ecommerce.CrudApi.Data.Write.Entities;
 
 namespace Ecommerce.CrudApi.Controllers;
 
@@ -12,13 +14,19 @@ namespace Ecommerce.CrudApi.Controllers;
 [Route("api/orders")]
 public sealed class OrdersController : ControllerBase
 {
-    private readonly CrudDbContext _db;
-    public OrdersController(CrudDbContext db) => _db = db;
+    private readonly WriteDbContext _db;
+    private readonly IMediator mediator;
+
+    public OrdersController(WriteDbContext db, IMediator mediator)
+    {
+        _db = db;
+        this.mediator = mediator;
+    }
 
     [HttpPost]
-    public async Task<IActionResult> Create(CreateOrderCommand command, [FromServices] CreateOrderCommandHandler handler, CancellationToken ct)
+    public async Task<IActionResult> Create(CreateOrderCommand command, CancellationToken ct)
     {
-        var result = await handler.Handle(command);
+        var result = await mediator.Send(command, ct);
 
         if (result.IsSuccess)
             return CreatedAtAction(nameof(GetById), new { id = result.Value }, new { id = result.Value });
@@ -28,14 +36,11 @@ public sealed class OrdersController : ControllerBase
 
     // Read "pesado": inclui join/Include de tudo e retorna mais do que precisa
     [HttpGet("{id:guid}")]
-    public async Task<IActionResult> GetById(Guid id, [FromServices]GetOrderByIdQueryHandler handler, CancellationToken ct)
+    public async Task<IActionResult> GetById(Guid id, CancellationToken ct)
     {
-        var result = await handler.Handle(new GetOrderByIdQuery(id));
+        var result = await mediator.Send(new GetOrderByIdQuery(id), ct);
         return result.ToActionResult();
     }
-
-    private string? GetProductNameById(int productId)
-        => _db.Products.Find(productId)?.Name;
 
     // O que vamos "quebrar" na aula
     [HttpPut("{id:guid}")]

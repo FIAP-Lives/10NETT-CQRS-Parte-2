@@ -1,12 +1,13 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace Ecommerce.CrudApi.Migrations
+namespace Ecommerce.CrudApi.Migrations.Write
 {
     /// <inheritdoc />
-    public partial class InitialMigration : Migration
+    public partial class InitialRead : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

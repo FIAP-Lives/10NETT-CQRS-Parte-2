@@ -1,5 +1,5 @@
-
-using Ecommerce.CrudApi.Data;
+using Ecommerce.CrudApi.Data.Write;
+using Ecommerce.CrudApi.Data.Write.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,8 +10,8 @@ namespace Ecommerce.CrudApi.Controllers;
 [Route("api/products")]
 public sealed class ProductsController : ControllerBase
 {
-    private readonly CrudDbContext _db;
-    public ProductsController(CrudDbContext db) => _db = db;
+    private readonly WriteDbContext _db;
+    public ProductsController(WriteDbContext db) => _db = db;
 
     [HttpPost]
     public async Task<IActionResult> Create(Product product, CancellationToken ct)

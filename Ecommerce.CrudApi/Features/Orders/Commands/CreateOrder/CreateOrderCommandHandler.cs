@@ -1,19 +1,22 @@
-﻿using Ecommerce.CrudApi.Data;
+﻿using Ecommerce.CrudApi.Data.Write;
+using Ecommerce.CrudApi.Data.Write.Entities;
+using MediatR;
+using System.Text.Json;
 
 namespace Ecommerce.CrudApi.Features.Orders.Commands.CreateOrder
 {
-    public sealed class CreateOrderCommandHandler 
+    public sealed class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Result<Guid>>
     {
         private readonly CreateOrderValidator validator;
-        private readonly CrudDbContext db;
+        private readonly WriteDbContext db;
 
-        public CreateOrderCommandHandler(CreateOrderValidator validator, CrudDbContext db)
+        public CreateOrderCommandHandler(CreateOrderValidator validator, WriteDbContext db)
         {
             this.validator = validator;
             this.db = db;
         }
 
-        public async Task<Result<Guid>> Handle(CreateOrderCommand command)
+        public async Task<Result<Guid>> Handle(CreateOrderCommand command, CancellationToken cancellationToken)
         {
             var validationResult = await validator.ValidateAsync(command);
             if (!validationResult.IsValid)
@@ -37,6 +40,14 @@ namespace Ecommerce.CrudApi.Features.Orders.Commands.CreateOrder
 
 
             db.Orders.Add(order);
+            await db.SaveChangesAsync();
+
+            var evt = new { orderId = order.Id };
+            db.OutboxMessages.Add(new Data.Write.Entities.OutboxMessage
+            {
+                Type = MessageTypes.ORDER_CHANGED,
+                Payload = JsonSerializer.Serialize(evt)
+            });
             await db.SaveChangesAsync();
 
             return Result<Guid>.Success(order.Id);

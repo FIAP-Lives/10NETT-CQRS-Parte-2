@@ -1,5 +1,5 @@
-
-using Ecommerce.CrudApi.Data;
+using Ecommerce.CrudApi.Data.Read;
+using Ecommerce.CrudApi.Data.Write;
 using Ecommerce.CrudApi.Features.Orders.Commands.CreateOrder;
 using Ecommerce.CrudApi.Features.Orders.Queries;
 using Ecommerce.CrudApi.Middlewares;
@@ -21,15 +21,22 @@ public class Program
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
 
-        builder.Services.AddDbContext<CrudDbContext>(opt =>
-            opt.UseNpgsql(builder.Configuration.GetConnectionString("WriteDb")));
+        builder.Services.AddDbContext<WriteDbContext>(opt => opt.UseNpgsql(builder.Configuration.GetConnectionString("WriteDb")));
+        builder.Services.AddDbContext<ReadDbContext>(opt => 
+        opt.UseNpgsql(builder.Configuration.GetConnectionString("ReadDb"),
+            x => x.MigrationsHistoryTable("__EFMigrationsHistory_Read")));
 
         builder.Services.AddTransient<ExceptionMiddleware>();
-
         builder.Services.AddTransient<CreateOrderCommandHandler>();
         builder.Services.AddTransient<GetOrderByIdQueryHandler>();
 
         builder.Services.AddValidatorsFromAssemblyContaining<Program>();
+        builder.Services.AddMediatR(x => { 
+            x.LicenseKey = builder.Configuration.GetValue<string>("mediatr-license");
+            x.RegisterServicesFromAssemblyContaining<Program>();
+        });
+        
+        builder.Services.AddHostedService<DbSyncBackgroundService>();
 
         var app = builder.Build();
 
