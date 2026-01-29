@@ -38,7 +38,10 @@ namespace Ecommerce.CrudApi.Infrastructure
                     .AsNoTracking()
                     .FirstOrDefaultAsync(x => x.Id == orderId, stoppingToken);
 
+                var productIds = order.Items.Select(i => i.ProductId).ToList();
+                
                 var products = await writeDbContext.Products
+                    .Where(p => productIds.Contains(p.Id))
                     .AsNoTracking()
                     .ToDictionaryAsync(x => x.Id, stoppingToken);
 
