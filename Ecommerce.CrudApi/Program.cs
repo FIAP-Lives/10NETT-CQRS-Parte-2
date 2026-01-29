@@ -1,6 +1,9 @@
 
 using Ecommerce.CrudApi.Data;
+using Ecommerce.CrudApi.Features.Orders.Commands.CreateOrder;
+using Ecommerce.CrudApi.Features.Orders.Queries;
 using Ecommerce.CrudApi.Middlewares;
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 
 namespace Ecommerce.CrudApi;
@@ -22,6 +25,11 @@ public class Program
             opt.UseNpgsql(builder.Configuration.GetConnectionString("WriteDb")));
 
         builder.Services.AddTransient<ExceptionMiddleware>();
+
+        builder.Services.AddTransient<CreateOrderCommandHandler>();
+        builder.Services.AddTransient<GetOrderByIdQueryHandler>();
+
+        builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
         var app = builder.Build();
 

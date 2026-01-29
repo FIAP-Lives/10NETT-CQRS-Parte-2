@@ -1,7 +1,10 @@
 ﻿using Ecommerce.CrudApi.Data;
+using Ecommerce.CrudApi.Features.Orders.Commands.CreateOrder;
 using Ecommerce.Shared.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Ecommerce.CrudApi;
+using Ecommerce.CrudApi.Features.Orders.Queries;
 
 namespace Ecommerce.CrudApi.Controllers;
 
@@ -13,46 +16,22 @@ public sealed class OrdersController : ControllerBase
     public OrdersController(CrudDbContext db) => _db = db;
 
     [HttpPost]
-    public async Task<IActionResult> Create(Order order, CancellationToken ct)
+    public async Task<IActionResult> Create(CreateOrderCommand command, [FromServices] CreateOrderCommandHandler handler, CancellationToken ct)
     {
-        // Risco de Overposting
-        order.Id = Guid.Empty;
-        order.Status = "Created";
+        var result = await handler.Handle(command);
 
-        _db.Orders.Add(order);
-        await _db.SaveChangesAsync(ct);
-        return CreatedAtAction(nameof(GetById), new { id = order.Id }, order);
+        if (result.IsSuccess)
+            return CreatedAtAction(nameof(GetById), new { id = result.Value }, new { id = result.Value });
+
+        return result.ToActionResult();
     }
 
     // Read "pesado": inclui join/Include de tudo e retorna mais do que precisa
     [HttpGet("{id:guid}")]
-    public async Task<IActionResult> GetById(Guid id, CancellationToken ct)
+    public async Task<IActionResult> GetById(Guid id, [FromServices]GetOrderByIdQueryHandler handler, CancellationToken ct)
     {
-        var order = await _db.Orders
-            .Include(o => o.Items)
-            .FirstOrDefaultAsync(o => o.Id == id, ct);
-
-        if (order is null) return NotFound();
-
-
-        var response = new
-        {
-            order.Id,
-            order.CustomerName,
-            order.ShippingAddress,
-            order.Status,
-            order.CreatedAtUtc,
-            Items = order.Items.Select(i => new
-            {
-                i.Id,
-                i.ProductId,
-                ProductName = GetProductNameById(i.ProductId),
-                i.Quantity,
-                i.UnitPrice
-            }).ToList()
-        };
-
-        return Ok(response);
+        var result = await handler.Handle(new GetOrderByIdQuery(id));
+        return result.ToActionResult();
     }
 
     private string? GetProductNameById(int productId)
