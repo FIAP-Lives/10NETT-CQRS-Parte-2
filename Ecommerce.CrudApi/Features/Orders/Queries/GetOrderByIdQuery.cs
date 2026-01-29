@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using Ecommerce.CrudApi.Shared;
+using MediatR;
 
 namespace Ecommerce.CrudApi.Features.Orders.Queries
 {

@@ -1,5 +1,6 @@
 ﻿using Ecommerce.CrudApi.Data.Write;
 using Ecommerce.CrudApi.Data.Write.Entities;
+using Ecommerce.CrudApi.Shared;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 

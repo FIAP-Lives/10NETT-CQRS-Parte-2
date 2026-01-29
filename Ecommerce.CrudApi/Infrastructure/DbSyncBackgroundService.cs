@@ -1,10 +1,10 @@
-﻿
-using Ecommerce.CrudApi.Data.Read;
+﻿using Ecommerce.CrudApi.Data.Read;
 using Ecommerce.CrudApi.Data.Write;
+using Ecommerce.CrudApi.Shared;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 
-namespace Ecommerce.CrudApi
+namespace Ecommerce.CrudApi.Infrastructure
 {
     internal sealed class DbSyncBackgroundService : BackgroundService
     {
@@ -44,10 +44,10 @@ namespace Ecommerce.CrudApi
 
                 var items = order.Items.Select(i => new
                 {
-                    ProductId = i.ProductId,
+                    i.ProductId,
                     ProductName = products.TryGetValue(i.ProductId, out var product) ? product.Name : "Unknown",
-                    Quantity = i.Quantity,
-                    UnitPrice = i.UnitPrice
+                    i.Quantity,
+                    i.UnitPrice
                 }).ToList();
 
                 var total = items.Sum(i => i.Quantity * i.UnitPrice);

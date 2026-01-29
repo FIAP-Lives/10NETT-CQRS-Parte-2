@@ -2,11 +2,11 @@
 using Ecommerce.Shared.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Ecommerce.CrudApi;
 using Ecommerce.CrudApi.Features.Orders.Queries;
 using MediatR;
 using Ecommerce.CrudApi.Data.Write;
 using Ecommerce.CrudApi.Data.Write.Entities;
+using Ecommerce.CrudApi.Shared;
 
 namespace Ecommerce.CrudApi.Controllers;
 

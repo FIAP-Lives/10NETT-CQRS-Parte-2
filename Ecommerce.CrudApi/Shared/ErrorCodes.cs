@@ -1,4 +1,4 @@
-﻿namespace Ecommerce.CrudApi
+﻿namespace Ecommerce.CrudApi.Shared
 {
     public static class ErrorCodes
     {

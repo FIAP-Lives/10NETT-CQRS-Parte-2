@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace Ecommerce.CrudApi
+namespace Ecommerce.CrudApi.Shared
 {
     public static class HttpResultMapper
     {

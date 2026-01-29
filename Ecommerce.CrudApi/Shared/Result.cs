@@ -1,4 +1,4 @@
-﻿namespace Ecommerce.CrudApi
+﻿namespace Ecommerce.CrudApi.Shared
 {
     public sealed class Result
     {
