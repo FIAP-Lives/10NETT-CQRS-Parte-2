@@ -11,7 +11,7 @@ public sealed class ExceptionMiddleware : IMiddleware
         {
             await next(context);
         }
-        catch (Shared.Exceptions.ValidationException ex)
+        catch (ValidationException ex)
         {
             context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
             await context.Response.WriteAsJsonAsync(new
